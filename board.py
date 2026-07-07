@@ -90,3 +90,9 @@ class Board:
     def movePiece(self, current_row, current_col, end_row, end_col, piece, boardState):
         boardState[current_row][current_col] = ""
         boardState[end_row][end_col] = piece
+
+    def highlightSquare(self, screen, rowAndCol: list[int]):
+
+        y = self.board_top + (rowAndCol[0] * self.square_size)
+        x = self.board_left + (rowAndCol[1] * self.square_size)
+        pygame.draw.rect(screen, "darkolivegreen1", pygame.Rect(x, y, self.square_size, self.square_size))

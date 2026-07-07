@@ -17,6 +17,12 @@ def getClickedSquare():
         return [square_y, square_x]
     return None
 
+def getLegalMoves(piece, row, col, boardState):
+    if piece.lower() == "p":
+        # print(row, col)
+        # print(boardState)
+        pass
+
 def main():
     running = True
     board = Board()
@@ -30,12 +36,16 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 clicked_position = getClickedSquare()
                 if not clicked_position: continue
-                
+
                 if selected_square is None:
                         if clicked_position != None:
                             clicked_row, clicked_col = clicked_position[0], clicked_position[1]
+
                         if board.boardState[clicked_row][clicked_col] != "":
                             selected_square = [clicked_row, clicked_col]
+                            piece = board.boardState[clicked_row][clicked_col]
+                            getLegalMoves(piece, clicked_row, clicked_col, board.boardState)
+
                         
                 else:
                     start_row, start_col = selected_square[0], selected_square[1]
@@ -54,6 +64,8 @@ def main():
         screen.fill("white")
         
         board.drawSquares(screen)
+        if selected_square is not None:
+            board.highlightSquare(screen, selected_square) 
         board.drawBoard(screen, screen_rect)
         board.drawPieces(screen)
 
