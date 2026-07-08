@@ -1,6 +1,7 @@
 import pygame
 from board import Board
 from sys import exit
+from piecesMove import *
 
 pygame.init()
 pygame.display.set_caption("Chess")
@@ -17,47 +18,9 @@ def getClickedSquare():
         return [square_y, square_x]
     return None
 
-def pawnMove(piece, row, col, boardState):
-        two_row_after = -2 if piece == "P" else 2
-        one_row_after = -1 if piece == "P" else 1
-        starting_row = 6 if piece == "P" else 1
-        possible_move = []
-
-        if (col > 0 and boardState[row + one_row_after][col - 1] != "") or (col < 7 and boardState[row + one_row_after][col + 1] != ""):
-            if col < 7 and boardState[row][col].isupper() ^ boardState[row + one_row_after][col + 1].isupper():
-                possible_move.append([row + one_row_after, col + 1])
-            if col > 0 and boardState[row][col].isupper() ^ boardState[row + one_row_after][col - 1].isupper():
-                possible_move.append([row + one_row_after, col - 1])
-
-        if row == starting_row:
-
-            if boardState[row + two_row_after][col] == "" and boardState[row + one_row_after][col] == "":
-                possible_move.append([row + one_row_after, col])
-                possible_move.append([row + two_row_after, col])
-                return possible_move
-            
-            if boardState[row + one_row_after][col] != "":
-                return possible_move
-            
-            if boardState[row + two_row_after][col] != "":
-                possible_move.append([row + one_row_after, col])
-                return possible_move
-            
-            else:
-                return possible_move
-            
-        else:
-            if boardState[row + one_row_after][col] == "":
-                possible_move.append([row + one_row_after, col])
-                return possible_move
-            else:
-                return possible_move
-
-
 def getLegalMoves(piece, row, col, boardState):
     if piece.lower() == "p":
         possible_move = pawnMove(piece, row, col, boardState)
-        print(possible_move)
         return possible_move
     else:
         return []
@@ -109,7 +72,6 @@ def main():
                             selected_square = [end_row, end_col]
                             piece = board.boardState[end_row][end_col]
                             legal_moves = getLegalMoves(piece, end_row, end_col, board.boardState)
-                            print("INVALID MOVE")
                             continue
                     else: 
                         continue
@@ -119,9 +81,11 @@ def main():
         
         board.drawSquares(screen)
         if selected_square is not None:
-            board.highlightSquare(screen, selected_square) 
+            board.highlightSquare(screen, selected_square)
         board.drawBoard(screen, screen_rect)
         board.drawPieces(screen)
+        if selected_square is not None:
+            board.highlightLegalMoves(screen, legal_moves)
 
 
         pygame.display.flip()
