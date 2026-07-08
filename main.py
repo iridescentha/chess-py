@@ -17,16 +17,57 @@ def getClickedSquare():
         return [square_y, square_x]
     return None
 
+def pawnMove(piece, row, col, boardState):
+        two_row_after = -2 if piece == "P" else 2
+        one_row_after = -1 if piece == "P" else 1
+        starting_row = 6 if piece == "P" else 1
+        possible_move = []
+
+        if (col > 0 and boardState[row + one_row_after][col - 1] != "") or (col < 7 and boardState[row + one_row_after][col + 1] != ""):
+            if col < 7 and boardState[row][col].isupper() ^ boardState[row + one_row_after][col + 1].isupper():
+                possible_move.append([row + one_row_after, col + 1])
+            if col > 0 and boardState[row][col].isupper() ^ boardState[row + one_row_after][col - 1].isupper():
+                possible_move.append([row + one_row_after, col - 1])
+
+        if row == starting_row:
+
+            if boardState[row + two_row_after][col] == "" and boardState[row + one_row_after][col] == "":
+                possible_move.append([row + one_row_after, col])
+                possible_move.append([row + two_row_after, col])
+                return possible_move
+            
+            if boardState[row + one_row_after][col] != "":
+                return possible_move
+            
+            if boardState[row + two_row_after][col] != "":
+                possible_move.append([row + one_row_after, col])
+                return possible_move
+            
+            else:
+                return possible_move
+            
+        else:
+            if boardState[row + one_row_after][col] == "":
+                possible_move.append([row + one_row_after, col])
+                return possible_move
+            else:
+                return possible_move
+
+
 def getLegalMoves(piece, row, col, boardState):
     if piece.lower() == "p":
-        # print(row, col)
-        # print(boardState)
-        pass
+        possible_move = pawnMove(piece, row, col, boardState)
+        print(possible_move)
+        return possible_move
+    else:
+        return []
+
 
 def main():
     running = True
     board = Board()
     selected_square = None
+    legal_moves = []
     while running:
         for event in pygame.event.get():
 
@@ -44,7 +85,7 @@ def main():
                         if board.boardState[clicked_row][clicked_col] != "":
                             selected_square = [clicked_row, clicked_col]
                             piece = board.boardState[clicked_row][clicked_col]
-                            getLegalMoves(piece, clicked_row, clicked_col, board.boardState)
+                            legal_moves = getLegalMoves(piece, clicked_row, clicked_col, board.boardState)
 
                         
                 else:
@@ -52,13 +93,26 @@ def main():
                     clicked_position = getClickedSquare()
 
                     if clicked_position != None: 
+                        piece = board.boardState[start_row][start_col]
                         end_row, end_col = clicked_position[0], clicked_position[1]
+
+                        if legal_moves == None: continue
+
+                        if [end_row, end_col] in legal_moves:
+                            board.movePiece(start_row, start_col, end_row, end_col, piece, board.boardState)
+                            selected_square = None
+                            
+                        elif [end_row, end_col] not in legal_moves and board.boardState[end_row][end_col] == "":
+                            selected_square = None
+
+                        elif board.boardState[end_row][end_col] != "":
+                            selected_square = [end_row, end_col]
+                            piece = board.boardState[end_row][end_col]
+                            legal_moves = getLegalMoves(piece, end_row, end_col, board.boardState)
+                            print("INVALID MOVE")
+                            continue
                     else: 
                         continue
-
-                    piece = board.boardState[start_row][start_col]
-                    board.movePiece(start_row, start_col, end_row, end_col, piece, board.boardState)
-                    selected_square = None
                 
                 
         screen.fill("white")
