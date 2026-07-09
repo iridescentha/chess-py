@@ -29,6 +29,8 @@ class Board:
     ]
 
     square_size = 80
+    circle_size = 18
+
     board_left = 320
     board_top = 40
     board_size = 640
@@ -89,10 +91,20 @@ class Board:
 
     def movePiece(self, current_row, current_col, end_row, end_col, piece, boardState):
         boardState[current_row][current_col] = ""
-        boardState[end_row][end_col] = piece
+        if piece.lower() == "p" and end_row == 0 or end_row == 7:
+            boardState[end_row][end_col] = "Q" if piece == "P" else "q"
+        else:
+            boardState[end_row][end_col] = piece
 
     def highlightSquare(self, screen, rowAndCol: list[int]):
 
         y = self.board_top + (rowAndCol[0] * self.square_size)
         x = self.board_left + (rowAndCol[1] * self.square_size)
         pygame.draw.rect(screen, "darkolivegreen1", pygame.Rect(x, y, self.square_size, self.square_size))
+
+    def highlightLegalMoves(self, screen, legal_moves):
+        if legal_moves is None: return
+        for square_pos in legal_moves:
+            y = self.board_top + (square_pos[0] * self.square_size + (self.square_size // 2))
+            x = self.board_left + (square_pos[1] * self.square_size + (self.square_size // 2))
+            pygame.draw.circle(screen, "gray36", (x, y), self.circle_size)

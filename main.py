@@ -1,6 +1,7 @@
 import pygame
 from board import Board
 from sys import exit
+from piecesMove import *
 
 pygame.init()
 pygame.display.set_caption("Chess")
@@ -19,14 +20,20 @@ def getClickedSquare():
 
 def getLegalMoves(piece, row, col, boardState):
     if piece.lower() == "p":
-        # print(row, col)
-        # print(boardState)
-        pass
+        pawn_possible_move = pawnMove(piece, row, col, boardState)
+        return pawn_possible_move
+    elif piece.lower() == "r":
+        rook_possible_move = rookMove(piece, row, col, boardState)
+        return rook_possible_move
+    else:
+        return []
+
 
 def main():
     running = True
     board = Board()
     selected_square = None
+    legal_moves = []
     while running:
         for event in pygame.event.get():
 
@@ -44,7 +51,7 @@ def main():
                         if board.boardState[clicked_row][clicked_col] != "":
                             selected_square = [clicked_row, clicked_col]
                             piece = board.boardState[clicked_row][clicked_col]
-                            getLegalMoves(piece, clicked_row, clicked_col, board.boardState)
+                            legal_moves = getLegalMoves(piece, clicked_row, clicked_col, board.boardState)
 
                         
                 else:
@@ -52,22 +59,36 @@ def main():
                     clicked_position = getClickedSquare()
 
                     if clicked_position != None: 
+                        piece = board.boardState[start_row][start_col]
                         end_row, end_col = clicked_position[0], clicked_position[1]
+
+                        if legal_moves == None: continue
+
+                        if [end_row, end_col] in legal_moves:
+                            board.movePiece(start_row, start_col, end_row, end_col, piece, board.boardState)
+                            selected_square = None
+                            
+                        elif [end_row, end_col] not in legal_moves and board.boardState[end_row][end_col] == "":
+                            selected_square = None
+
+                        elif board.boardState[end_row][end_col] != "":
+                            selected_square = [end_row, end_col]
+                            piece = board.boardState[end_row][end_col]
+                            legal_moves = getLegalMoves(piece, end_row, end_col, board.boardState)
+                            continue
                     else: 
                         continue
-
-                    piece = board.boardState[start_row][start_col]
-                    board.movePiece(start_row, start_col, end_row, end_col, piece, board.boardState)
-                    selected_square = None
                 
                 
         screen.fill("white")
         
         board.drawSquares(screen)
         if selected_square is not None:
-            board.highlightSquare(screen, selected_square) 
+            board.highlightSquare(screen, selected_square)
         board.drawBoard(screen, screen_rect)
         board.drawPieces(screen)
+        if selected_square is not None:
+            board.highlightLegalMoves(screen, legal_moves)
 
 
         pygame.display.flip()
