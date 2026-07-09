@@ -51,6 +51,8 @@ class Board:
         "k": black_king,
     }
 
+    move_turn = "white"
+
     def __init__(self):
         pass
 

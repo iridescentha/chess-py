@@ -49,9 +49,11 @@ def main():
                             clicked_row, clicked_col = clicked_position[0], clicked_position[1]
 
                         if board.boardState[clicked_row][clicked_col] != "":
-                            selected_square = [clicked_row, clicked_col]
                             piece = board.boardState[clicked_row][clicked_col]
-                            legal_moves = getLegalMoves(piece, clicked_row, clicked_col, board.boardState)
+                            if piece.islower() and board.move_turn == "black" or piece.isupper() and board.move_turn == "white":
+                                selected_square = [clicked_row, clicked_col]
+                                legal_moves = getLegalMoves(piece, clicked_row, clicked_col, board.boardState)
+                            else: print("Not your Move!"); 
 
                         
                 else:
@@ -66,6 +68,9 @@ def main():
 
                         if [end_row, end_col] in legal_moves:
                             board.movePiece(start_row, start_col, end_row, end_col, piece, board.boardState)
+                            if piece.isupper(): board.move_turn = "black"
+                            else: board.move_turn = "white"
+                            
                             selected_square = None
                             
                         elif [end_row, end_col] not in legal_moves and board.boardState[end_row][end_col] == "":
