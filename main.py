@@ -20,8 +20,11 @@ def getClickedSquare():
 
 def getLegalMoves(piece, row, col, boardState):
     if piece.lower() == "p":
-        possible_move = pawnMove(piece, row, col, boardState)
-        return possible_move
+        pawn_possible_move = pawnMove(piece, row, col, boardState)
+        return pawn_possible_move
+    elif piece.lower() == "r":
+        rook_possible_move = rookMove(piece, row, col, boardState)
+        return rook_possible_move
     else:
         return []
 

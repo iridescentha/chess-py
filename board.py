@@ -21,7 +21,7 @@ class Board:
     ["r", "n", "b", "q", "k", "b", "n", "r"],
     ["p", "p", "p", "p", "p", "p", "p", "p"],
     ["",  "",  "",  "",  "",  "",  "",  ""],
-    ["",  "",  "",  "",  "",  "",  "",  ""],
+    ["",  "",  "P",  "",  "R",  "",  "",  ""],
     ["",  "",  "",  "",  "",  "",  "",  ""],
     ["",  "",  "",  "",  "",  "",  "",  ""],
     ["P", "P", "P", "P", "P", "P", "P", "P"],
@@ -91,7 +91,10 @@ class Board:
 
     def movePiece(self, current_row, current_col, end_row, end_col, piece, boardState):
         boardState[current_row][current_col] = ""
-        boardState[end_row][end_col] = piece
+        if piece.lower() == "p" and end_row == 0 or end_row == 7:
+            boardState[end_row][end_col] = "Q" if piece == "P" else "q"
+        else:
+            boardState[end_row][end_col] = piece
 
     def highlightSquare(self, screen, rowAndCol: list[int]):
 
@@ -99,7 +102,8 @@ class Board:
         x = self.board_left + (rowAndCol[1] * self.square_size)
         pygame.draw.rect(screen, "darkolivegreen1", pygame.Rect(x, y, self.square_size, self.square_size))
 
-    def highlightLegalMoves(self, screen, legal_moves,):
+    def highlightLegalMoves(self, screen, legal_moves):
+        if legal_moves is None: return
         for square_pos in legal_moves:
             y = self.board_top + (square_pos[0] * self.square_size + (self.square_size // 2))
             x = self.board_left + (square_pos[1] * self.square_size + (self.square_size // 2))
