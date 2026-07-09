@@ -35,6 +35,7 @@ def pawnMove(piece, row, col, boardState):
             else:
                 return pawn_possible_move
 
+
 def rookMove(piece, row, col, boardState):
     rook_possible_move = []
 
@@ -81,3 +82,32 @@ def rookMove(piece, row, col, boardState):
     
     return rook_possible_move
     
+
+def knightMove(piece, row, col, boardState):
+    knight_possible_move = []
+    if row > 1:
+        if (col > 0 and boardState[row-2][col-1] == "") or (col > 0 and boardState[row-2][col-1].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row-2, col-1])
+
+        if (col < 7 and boardState[row-2][col+1] == "") or (col < 7 and boardState[row-2][col+1].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row-2, col+1])
+
+        if (col > 1 and boardState[row-1][col-2] == "") or (col > 1 and boardState[row-1][col-2].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row-1, col-2])
+
+        if (col < 6 and boardState[row-1][col+2] == "") or (col < 6 and boardState[row-1][col+2].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row-1, col+2])
+
+    if row < 6:
+        if (col > 0 and boardState[row+2][col-1] == "") or (col > 0 and boardState[row+2][col-1].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row+2, col-1])
+
+        if (col < 7 and boardState[row+2][col+1] == "") or (col > 7 and boardState[row+2][col+1].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row+2, col+1])
+
+        if (col > 1 and boardState[row+1][col-2] == "") or (col > 1 and boardState[row+1][col-2].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row+1, col-2])
+
+        if (col < 6 and boardState[row+1][col+2] == "") or (col < 6 and boardState[row+1][col+2].isupper() ^ piece.isupper()): 
+            knight_possible_move.append([row+1, col+2])
+    return knight_possible_move

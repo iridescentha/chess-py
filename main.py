@@ -25,9 +25,11 @@ def getLegalMoves(piece, row, col, boardState):
     elif piece.lower() == "r":
         rook_possible_move = rookMove(piece, row, col, boardState)
         return rook_possible_move
+    elif piece.lower() == "n":
+        knight_possible_move = knightMove(piece, row, col, boardState)
+        return knight_possible_move
     else:
         return []
-
 
 def main():
     running = True
@@ -77,9 +79,10 @@ def main():
                             selected_square = None
 
                         elif board.boardState[end_row][end_col] != "":
-                            selected_square = [end_row, end_col]
-                            piece = board.boardState[end_row][end_col]
-                            legal_moves = getLegalMoves(piece, end_row, end_col, board.boardState)
+                            if board.boardState[end_row][end_col].islower() and board.move_turn == "black" or board.boardState[end_row][end_col].isupper() and board.move_turn == "white":
+                                selected_square = [end_row, end_col]
+                                piece = board.boardState[end_row][end_col]
+                                legal_moves = getLegalMoves(piece, end_row, end_col, board.boardState)
                             continue
                     else: 
                         continue
