@@ -114,6 +114,7 @@ def knightMove(piece, row, col, boardState):
             knight_possible_move.append([row+1, col+2])
     return knight_possible_move
 
+
 def bishopMove(piece, row, col, boardState):
     bishop_possible_move = []
     top_left_diagonal_row = row
@@ -169,3 +170,14 @@ def bishopMove(piece, row, col, boardState):
         bishop_possible_move.append([bottom_right_diagonal_row, bottom_right_diagonal_col])
     
     return bishop_possible_move
+
+
+def queenMove(piece, row, col, boardState):
+    queen_possible_move = []
+    line_move = rookMove(piece, row, col, boardState)
+    for line in line_move: queen_possible_move.append(line)
+
+    diagonal_move = bishopMove(piece, row, col, boardState)
+    for diagonal in diagonal_move: queen_possible_move.append(diagonal)
+    
+    return queen_possible_move

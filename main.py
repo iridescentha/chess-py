@@ -31,6 +31,9 @@ def getLegalMoves(piece, row, col, boardState):
     elif piece.lower() == "b":
         bishop_possible_move = bishopMove(piece, row, col, boardState)
         return bishop_possible_move
+    elif piece.lower() == "q":
+        queen_possible_move = queenMove(piece, row, col, boardState)
+        return queen_possible_move
     else:
         return []
 
