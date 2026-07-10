@@ -28,6 +28,9 @@ def getLegalMoves(piece, row, col, boardState):
     elif piece.lower() == "n":
         knight_possible_move = knightMove(piece, row, col, boardState)
         return knight_possible_move
+    elif piece.lower() == "b":
+        bishop_possible_move = bishopMove(piece, row, col, boardState)
+        return bishop_possible_move
     else:
         return []
 

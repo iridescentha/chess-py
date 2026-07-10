@@ -17,17 +17,6 @@ black_queen = pygame.transform.scale(pygame.image.load("assets/black_queen.png")
 black_king = pygame.transform.scale(pygame.image.load("assets/black_king.png"), (piece_width, piece_height))
 
 class Board:
-    boardState = [
-    ["r", "n", "b", "q", "k", "b", "n", "r"],
-    ["p", "p", "p", "p", "p", "p", "p", "p"],
-    ["",  "",  "",  "",  "",  "",  "",  ""],
-    ["",  "",  "",  "",  "",  "",  "",  ""],
-    ["",  "",  "",  "",  "",  "",  "",  ""],
-    ["",  "",  "",  "",  "",  "",  "",  ""],
-    ["P", "P", "P", "P", "P", "P", "P", "P"],
-    ["R", "N", "B", "Q", "K", "B", "N", "R"],
-    ]
-
     square_size = 80
     circle_size = 18
 
@@ -51,10 +40,18 @@ class Board:
         "k": black_king,
     }
 
-    move_turn = "white"
-
     def __init__(self):
-        pass
+        self.boardState = [
+            ["r", "n", "b", "q", "k", "b", "n", "r"],
+            ["p", "p", "p", "p", "p", "p", "p", "p"],
+            ["",  "",  "",  "",  "",  "",  "",  ""],
+            ["",  "",  "",  "",  "",  "",  "",  ""],
+            ["",  "",  "",  "",  "",  "",  "",  ""],
+            ["",  "",  "",  "",  "",  "",  "",  ""],
+            ["P", "P", "P", "P", "P", "P", "P", "P"],
+            ["R", "N", "B", "Q", "K", "B", "N", "R"],
+            ]
+        self.move_turn = "white"
 
     def drawBoard(self, screen, screen_rect):
         rect = pygame.Rect(0, 0, self.board_size, self.board_size)
@@ -93,7 +90,7 @@ class Board:
 
     def movePiece(self, current_row, current_col, end_row, end_col, piece, boardState):
         boardState[current_row][current_col] = ""
-        if piece.lower() == "p" and end_row == 0 or end_row == 7:
+        if piece.lower() == "p" and (end_row == 0 or end_row == 7):
             boardState[end_row][end_col] = "Q" if piece == "P" else "q"
         else:
             boardState[end_row][end_col] = piece
