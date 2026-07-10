@@ -34,8 +34,9 @@ def getLegalMoves(piece, row, col, boardState):
     elif piece.lower() == "q":
         queen_possible_move = queenMove(piece, row, col, boardState)
         return queen_possible_move
-    else:
-        return []
+    elif piece.lower() == "k":
+        king_possible_move = kingMove(piece, row, col, boardState)
+        return king_possible_move
 
 def main():
     running = True

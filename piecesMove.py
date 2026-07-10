@@ -181,3 +181,35 @@ def queenMove(piece, row, col, boardState):
     for diagonal in diagonal_move: queen_possible_move.append(diagonal)
     
     return queen_possible_move
+
+
+def kingMove(piece, row, col, boardState):
+    king_possible_move = []
+
+    if col > 0 and (boardState[row][col-1] == "" or boardState[row][col-1].isupper() ^ piece.isupper()):
+        king_possible_move.append([row, col-1])
+
+    if col < 7 and (boardState[row][col+1] == "" or boardState[row][col+1].isupper() ^ piece.isupper()):
+        king_possible_move.append([row, col+1])
+
+    if row > 0:
+        if (boardState[row-1][col] == "" or boardState[row-1][col].isupper() ^ piece.isupper()):
+            king_possible_move.append([row-1, col])
+
+        if col > 0 and (boardState[row-1][col-1] == "" or boardState[row-1][col-1].isupper() ^ piece.isupper()):
+            king_possible_move.append([row-1, col-1])
+
+        if col < 7 and (boardState[row-1][col+1] == "" or boardState[row-1][col+1].isupper() ^ piece.isupper()):
+            king_possible_move.append([row-1, col+1])
+
+    if row < 7:
+        if (boardState[row+1][col] == "" or boardState[row+1][col].isupper() ^ piece.isupper()):
+            king_possible_move.append([row+1, col])
+
+        if col > 0 and (boardState[row+1][col-1] == "" or boardState[row+1][col-1].isupper() ^ piece.isupper()):
+            king_possible_move.append([row+1, col-1])
+
+        if col < 7 and (boardState[row+1][col+1] == "" or boardState[row+1][col+1].isupper() ^ piece.isupper()):
+            king_possible_move.append([row+1, col+1])
+
+    return king_possible_move
