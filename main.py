@@ -18,7 +18,7 @@ def getClickedSquare():
         return [square_y, square_x]
     return None
 
-def getLegalMoves(piece, row, col, boardState):
+def getLegalMoves(piece, row, col, boardState, move_turn):
     if piece.lower() == "p":
         pawn_possible_move = pawnMove(piece, row, col, boardState)
         return pawn_possible_move
@@ -36,7 +36,14 @@ def getLegalMoves(piece, row, col, boardState):
         return queen_possible_move
     elif piece.lower() == "k":
         king_possible_move = kingMove(piece, row, col, boardState)
-        return king_possible_move
+        filtered_king_possible_move = []
+        attacked_squares = getAttackedSquares(boardState, move_turn)
+        for move in king_possible_move:
+            if move not in attacked_squares:
+                filtered_king_possible_move.append(move)
+            else:
+                continue
+        return filtered_king_possible_move
 
 def main():
     running = True
@@ -61,7 +68,7 @@ def main():
                             piece = board.boardState[clicked_row][clicked_col]
                             if piece.islower() and board.move_turn == "black" or piece.isupper() and board.move_turn == "white":
                                 selected_square = [clicked_row, clicked_col]
-                                legal_moves = getLegalMoves(piece, clicked_row, clicked_col, board.boardState)
+                                legal_moves = getLegalMoves(piece, clicked_row, clicked_col, board.boardState, board.move_turn)
                             else: print("Not your Move!"); 
 
                         
@@ -89,7 +96,7 @@ def main():
                             if board.boardState[end_row][end_col].islower() and board.move_turn == "black" or board.boardState[end_row][end_col].isupper() and board.move_turn == "white":
                                 selected_square = [end_row, end_col]
                                 piece = board.boardState[end_row][end_col]
-                                legal_moves = getLegalMoves(piece, end_row, end_col, board.boardState)
+                                legal_moves = getLegalMoves(piece, end_row, end_col, board.boardState, board.move_turn)
                             continue
                     else: 
                         continue
