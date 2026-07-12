@@ -98,7 +98,7 @@ def rookAttackingMove(row, col, boardState, move_turn):
         if boardState[row][left_col] == "":
             rook_attack_move.append([row, left_col])
 
-    for right_col in range(col+1, 8, -1):
+    for right_col in range(col+1, 8, 1):
         if boardState[row][right_col] == king:
             rook_attack_move.append([row, right_col])
             continue
@@ -362,6 +362,20 @@ def kingMove(piece, row, col, boardState):
 
     return king_possible_move
 
+def kingAttackingMove(row, col, boardState, move_turn):
+    king_attack_move = []
+
+    king_attack_move.append([row-1, col-1])
+    king_attack_move.append([row-1, col])
+    king_attack_move.append([row-1, col+1])
+    king_attack_move.append([row, col-1])
+    king_attack_move.append([row, col+1])
+    king_attack_move.append([row+1, col-1])
+    king_attack_move.append([row+1, col])
+    king_attack_move.append([row+1, col+1])
+
+    return king_attack_move
+
 
 def getAttackedSquares(boardState, move_turn):
     attacked_squares = []
@@ -383,37 +397,37 @@ def getAttackedSquares(boardState, move_turn):
                     attacked_squares += queenAttackingMove(row, col, boardState, move_turn)
 
                 if boardState[row][col] == "k":
-                    attacked_squares += kingMove(boardState[row][col], row, col, boardState)
+                    attacked_squares += kingAttackingMove(row, col, boardState, move_turn)
 
                 if boardState[row][col] == "p":
                     if col > 0:
-                        attacked_squares.append([row-1, col-1])
+                        attacked_squares.append([row+1, col-1])
                     if col < 7:
-                        attacked_squares.append([row-1, col+1])
-    
+                        attacked_squares.append([row+1, col+1])
+
     elif move_turn == "black":
         for row in range(8):
             for col in range(8):
                 if boardState[row][col] == "": continue
 
                 if boardState[row][col] == "R":
-                    attacked_squares += rookMove(boardState[row][col], row, col, boardState)
+                    attacked_squares += rookAttackingMove(row, col, boardState, move_turn)
                 
                 if boardState[row][col] == "N":
                     attacked_squares += knightMove(boardState[row][col], row, col, boardState)
 
                 if boardState[row][col] == "B":
-                    attacked_squares += bishopMove(boardState[row][col], row, col, boardState)
+                    attacked_squares += bishopAttackingMove(row, col, boardState, move_turn)
                 
                 if boardState[row][col] == "Q":
-                    attacked_squares += queenMove(boardState[row][col], row, col, boardState)
+                    attacked_squares += queenAttackingMove(row, col, boardState, move_turn)
 
                 if boardState[row][col] == "K":
-                    attacked_squares += kingMove(boardState[row][col], row, col, boardState)
+                    attacked_squares += kingAttackingMove(row, col, boardState, move_turn)
 
                 if boardState[row][col] == "P":
                     if col > 0:
-                        attacked_squares.append([row+1, col-1])
+                        attacked_squares.append([row-1, col-1])
                     if col < 7:
-                        attacked_squares.append([row+1, col+1])
+                        attacked_squares.append([row-1, col+1])
     return attacked_squares
