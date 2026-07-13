@@ -55,6 +55,7 @@ def main():
     board = Board()
     selected_square = None
     legal_moves = []
+    king_in_check = False
     while running:
         for event in pygame.event.get():
 
@@ -91,6 +92,7 @@ def main():
                             board.movePiece(start_row, start_col, end_row, end_col, piece, board.boardState)
                             if piece.isupper(): board.move_turn = "black"
                             else: board.move_turn = "white"
+                            king_in_check = isKingInCheck(board.boardState, board.move_turn)
                             
                             selected_square = None
                             
@@ -112,6 +114,8 @@ def main():
         board.drawSquares(screen)
         if selected_square is not None:
             board.highlightSquare(screen, selected_square)
+        if king_in_check:
+            board.highlightKingCheck(screen, findKingPosition(board.boardState, board.move_turn))
         board.drawBoard(screen, screen_rect)
         board.drawPieces(screen)
         if selected_square is not None:

@@ -107,3 +107,8 @@ class Board:
             y = self.board_top + (square_pos[0] * self.square_size + (self.square_size // 2))
             x = self.board_left + (square_pos[1] * self.square_size + (self.square_size // 2))
             pygame.draw.circle(screen, "gray36", (x, y), self.circle_size)
+
+    def highlightKingCheck(self, screen, king_pos):
+        y = self.board_top + (king_pos[0] * self.square_size)
+        x = self.board_left + (king_pos[1] * self.square_size)
+        pygame.draw.rect(screen, "red", pygame.Rect(x, y, self.square_size, self.square_size))
