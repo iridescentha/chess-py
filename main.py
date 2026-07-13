@@ -18,26 +18,31 @@ def getClickedSquare():
         return [square_y, square_x]
     return None
 
-def getLegalMoves(piece, row, col, boardState, move_turn):
+def getLegalMoves(piece, start_row, start_col, boardState, move_turn):
+    attacked_squares = getAttackedSquares(boardState, move_turn)
     if piece.lower() == "p":
-        pawn_possible_move = pawnMove(piece, row, col, boardState)
-        return pawn_possible_move
+        pawn_possible_move = pawnMove(piece, start_row, start_col, boardState)
+        return filterSafeMoves(start_row, start_col, pawn_possible_move, piece, boardState, move_turn)
+    
     elif piece.lower() == "r":
-        rook_possible_move = rookMove(piece, row, col, boardState)
-        return rook_possible_move
+        rook_possible_move = rookMove(piece, start_row, start_col, boardState)
+        return filterSafeMoves(start_row, start_col, rook_possible_move, piece, boardState, move_turn)
+    
     elif piece.lower() == "n":
-        knight_possible_move = knightMove(piece, row, col, boardState)
-        return knight_possible_move
+        knight_possible_move = knightMove(piece, start_row, start_col, boardState)
+        return filterSafeMoves(start_row, start_col, knight_possible_move, piece, boardState, move_turn)
+    
     elif piece.lower() == "b":
-        bishop_possible_move = bishopMove(piece, row, col, boardState)
-        return bishop_possible_move
+        bishop_possible_move = bishopMove(piece, start_row, start_col, boardState)
+        return filterSafeMoves(start_row, start_col, bishop_possible_move, piece, boardState, move_turn)
+    
     elif piece.lower() == "q":
-        queen_possible_move = queenMove(piece, row, col, boardState)
-        return queen_possible_move
+        queen_possible_move = queenMove(piece, start_row, start_col, boardState)
+        return filterSafeMoves(start_row, start_col, queen_possible_move, piece, boardState, move_turn)
+    
     elif piece.lower() == "k":
-        king_possible_move = kingMove(piece, row, col, boardState)
+        king_possible_move = kingMove(piece, start_row, start_col, boardState)
         filtered_king_possible_move = []
-        attacked_squares = getAttackedSquares(boardState, move_turn)
         for move in king_possible_move:
             if move not in attacked_squares:
                 filtered_king_possible_move.append(move)

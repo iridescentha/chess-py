@@ -378,56 +378,79 @@ def kingAttackingMove(row, col, boardState, move_turn):
 
 
 def getAttackedSquares(boardState, move_turn):
+    piece_name = "rnbqkp" if move_turn == "white" else "RNBQKP"
     attacked_squares = []
-    if move_turn == "white":
-        for row in range(8):
-            for col in range(8):
-                if boardState[row][col] == "": continue
+    for row in range(8):
+        for col in range(8):
+            left_pawn_diagonal = [row+1, col-1] if move_turn == "white" else [row-1, col-1]
+            right_pawn_diagonal = [row+1, col+1] if move_turn == "white" else [row-1, col+1]
 
-                if boardState[row][col] == "r":
-                    attacked_squares += rookAttackingMove(row, col, boardState, move_turn)
+            if boardState[row][col] == "": continue
+
+            if boardState[row][col] == piece_name[0]:
+                attacked_squares += rookAttackingMove(row, col, boardState, move_turn)
                 
-                if boardState[row][col] == "n":
-                    attacked_squares += knightMove(boardState[row][col], row, col, boardState)
+            if boardState[row][col] == piece_name[1]:
+                attacked_squares += knightMove(boardState[row][col], row, col, boardState)
 
-                if boardState[row][col] == "b":
-                    attacked_squares += bishopAttackingMove(row, col, boardState, move_turn)
+            if boardState[row][col] == piece_name[2]:
+                attacked_squares += bishopAttackingMove(row, col, boardState, move_turn)
                 
-                if boardState[row][col] == "q":
-                    attacked_squares += queenAttackingMove(row, col, boardState, move_turn)
+            if boardState[row][col] == piece_name[3]:
+                attacked_squares += queenAttackingMove(row, col, boardState, move_turn)
 
-                if boardState[row][col] == "k":
-                    attacked_squares += kingAttackingMove(row, col, boardState, move_turn)
+            if boardState[row][col] == piece_name[4]:
+                attacked_squares += kingAttackingMove(row, col, boardState, move_turn)
 
-                if boardState[row][col] == "p":
-                    if col > 0:
-                        attacked_squares.append([row+1, col-1])
-                    if col < 7:
-                        attacked_squares.append([row+1, col+1])
+            if boardState[row][col] == piece_name[5]:
+                if col > 0:
 
-    elif move_turn == "black":
-        for row in range(8):
-            for col in range(8):
-                if boardState[row][col] == "": continue
-
-                if boardState[row][col] == "R":
-                    attacked_squares += rookAttackingMove(row, col, boardState, move_turn)
-                
-                if boardState[row][col] == "N":
-                    attacked_squares += knightMove(boardState[row][col], row, col, boardState)
-
-                if boardState[row][col] == "B":
-                    attacked_squares += bishopAttackingMove(row, col, boardState, move_turn)
-                
-                if boardState[row][col] == "Q":
-                    attacked_squares += queenAttackingMove(row, col, boardState, move_turn)
-
-                if boardState[row][col] == "K":
-                    attacked_squares += kingAttackingMove(row, col, boardState, move_turn)
-
-                if boardState[row][col] == "P":
-                    if col > 0:
-                        attacked_squares.append([row-1, col-1])
-                    if col < 7:
-                        attacked_squares.append([row-1, col+1])
+                    attacked_squares.append(left_pawn_diagonal)
+                if col < 7:
+                    attacked_squares.append(right_pawn_diagonal)
     return attacked_squares
+
+
+def findKingPosition(boardState, move_turn):
+    king = "K" if move_turn == "white" else "k"
+    for row in range(8):
+        for col in range(8):
+            if boardState[row][col] == king:
+                return [row, col]
+            
+
+def simulateMove(start_row, start_col, end_row, end_col, piece, boardState, move_turn):
+    copy_board_state = []
+    for i in range(8):
+        copy_board_state.append(boardState[i].copy())
+    
+    copy_board_state[start_row][start_col] = ""
+    copy_board_state[end_row][end_col] = piece
+    king_in_check = isKingInCheck(copy_board_state, move_turn)
+    if king_in_check:
+        return False
+    else:
+        return True
+
+
+def isKingInCheck(boardState, move_turn):
+    king_pos = findKingPosition(boardState, move_turn)
+    attacked_squares = getAttackedSquares(boardState, move_turn)
+
+    if king_pos in attacked_squares:
+        return True
+    else:
+        return False
+
+
+def filterSafeMoves(start_row, start_col, possible_moves, piece, boardState, move_turn):
+    new_legal_moves = []
+
+    for i in range(len(possible_moves)):
+        end_row = possible_moves[i][0]
+        end_col = possible_moves[i][1]
+        simulate_result = simulateMove(start_row, start_col, end_row, end_col, piece, boardState, move_turn)
+        if simulate_result == True:
+            new_legal_moves.append([end_row, end_col])
+
+    return new_legal_moves
