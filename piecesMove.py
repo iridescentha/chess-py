@@ -35,6 +35,7 @@ def pawnMove(piece, row, col, boardState):
             else:
                 return pawn_possible_move
 
+
 def rookMove(piece, row, col, boardState):
     rook_possible_move = []
 
@@ -59,25 +60,397 @@ def rookMove(piece, row, col, boardState):
             rook_possible_move.append([row, right_col])
 
 
-    for left_row in range(row-1, -1, -1):
-        if boardState[left_row][col] != "" and boardState[left_row][col].isupper() ^ piece.isupper():
-            rook_possible_move.append([left_row, col])
+    for top_row in range(row-1, -1, -1):
+        if boardState[top_row][col] != "" and boardState[top_row][col].isupper() ^ piece.isupper():
+            rook_possible_move.append([top_row, col])
 
-        if boardState[left_row][col] != "":
+        if boardState[top_row][col] != "":
             break
         
-        if boardState[left_row][col] == "":
-            rook_possible_move.append([left_row, col])
+        if boardState[top_row][col] == "":
+            rook_possible_move.append([top_row, col])
 
-    for right_row in range(row+1, 8, 1):
-        if boardState[right_row][col] != "" and boardState[right_row][col].isupper() ^ piece.isupper():
-            rook_possible_move.append([right_row, col])
+    for bottom_row in range(row+1, 8, 1):
+        if boardState[bottom_row][col] != "" and boardState[bottom_row][col].isupper() ^ piece.isupper():
+            rook_possible_move.append([bottom_row, col])
 
-        if boardState[right_row][col] != "":
+        if boardState[bottom_row][col] != "":
             break
         
-        if boardState[right_row][col] == "":
-            rook_possible_move.append([right_row, col])
+        if boardState[bottom_row][col] == "":
+            rook_possible_move.append([bottom_row, col])
     
     return rook_possible_move
+
+def rookAttackingMove(row, col, boardState, move_turn):
+    rook_attack_move = []
+    king = "K" if move_turn == "white" else "k"
+
+    for left_col in range(col-1, -1, -1):
+        if boardState[row][left_col] == king:
+            rook_attack_move.append([row, left_col])
+            continue
+
+        if boardState[row][left_col] != "" and boardState[row][left_col] != king:
+            rook_attack_move.append([row, left_col])
+            break
+
+        if boardState[row][left_col] == "":
+            rook_attack_move.append([row, left_col])
+
+    for right_col in range(col+1, 8, 1):
+        if boardState[row][right_col] == king:
+            rook_attack_move.append([row, right_col])
+            continue
+
+        if boardState[row][right_col] != "" and boardState[row][right_col] != king:
+            rook_attack_move.append([row, right_col])
+            break
+
+        if boardState[row][right_col] == "":
+            rook_attack_move.append([row, right_col])
+
+    for top_row in range(row-1, -1, -1):
+        if boardState[top_row][col] == king:
+            rook_attack_move.append([top_row, col])
+            continue
+
+        if boardState[top_row][col] != "" and boardState[top_row][col] != king:
+            rook_attack_move.append([top_row, col])
+            break
+
+        if boardState[top_row][col] == "":
+            rook_attack_move.append([top_row, col])
+
+    for bottom_row in range(row+1, 8, 1):
+        if boardState[bottom_row][col] == king:
+            rook_attack_move.append([bottom_row, col])
+            continue
+
+        if boardState[bottom_row][col] != "" and boardState[bottom_row][col] != king:
+            rook_attack_move.append([bottom_row, col])
+            break
+
+        if boardState[bottom_row][col] == "":
+            rook_attack_move.append([bottom_row, col])
+    return rook_attack_move
     
+
+def knightMove(piece, row, col, boardState):
+    knight_possible_move = []
+    if row > 1:
+        if col > 0 and (boardState[row-2][col-1] == "" or boardState[row-2][col-1].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row-2, col-1])
+
+        if col < 7 and (boardState[row-2][col+1] == "" or boardState[row-2][col+1].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row-2, col+1])
+
+    if row > 1 or row == 1:
+        if col > 1 and (boardState[row-1][col-2] == "" or boardState[row-1][col-2].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row-1, col-2])
+
+        if col < 6 and (boardState[row-1][col+2] == "" or boardState[row-1][col+2].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row-1, col+2])
+
+    if row < 6:
+        if col > 0 and (boardState[row+2][col-1] == "" or boardState[row+2][col-1].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row+2, col-1])
+
+        if col < 7 and (boardState[row+2][col+1] == "" or boardState[row+2][col+1].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row+2, col+1])
+
+    if row < 6 or row == 6:
+        if col > 1 and (boardState[row+1][col-2] == "" or boardState[row+1][col-2].isupper() ^ piece.isupper()):
+            knight_possible_move.append([row+1, col-2])
+
+        if col < 6 and (boardState[row+1][col+2] == "" or boardState[row+1][col+2].isupper() ^ piece.isupper()): 
+            knight_possible_move.append([row+1, col+2])
+    return knight_possible_move
+
+
+def bishopMove(piece, row, col, boardState):
+    bishop_possible_move = []
+    top_left_diagonal_row = row
+    top_left_diagonal_col = col
+    while top_left_diagonal_row > 0 or top_left_diagonal_col > 0:
+        if top_left_diagonal_row == 0 or top_left_diagonal_col == 0: break
+        top_left_diagonal_row -=1
+        top_left_diagonal_col -=1
+        if boardState[top_left_diagonal_row][top_left_diagonal_col] != "" and boardState[top_left_diagonal_row][top_left_diagonal_col].isupper() ^ piece.isupper():
+            bishop_possible_move.append([top_left_diagonal_row, top_left_diagonal_col])
+
+        if boardState[top_left_diagonal_row][top_left_diagonal_col] != "": break
+
+        bishop_possible_move.append([top_left_diagonal_row, top_left_diagonal_col])
+
+    top_right_diagonal_row = row
+    top_right_diagonal_col = col
+    while top_right_diagonal_row > 0 or top_right_diagonal_col < 7:
+        if top_right_diagonal_row == 0 or top_right_diagonal_col == 7: break
+        top_right_diagonal_row -=1
+        top_right_diagonal_col +=1
+        if boardState[top_right_diagonal_row][top_right_diagonal_col] != "" and boardState[top_right_diagonal_row][top_right_diagonal_col].isupper() ^ piece.isupper():
+            bishop_possible_move.append([top_right_diagonal_row, top_right_diagonal_col])
+
+        if boardState[top_right_diagonal_row][top_right_diagonal_col] != "": break
+
+        bishop_possible_move.append([top_right_diagonal_row, top_right_diagonal_col])
+
+    bottom_left_diagonal_row = row
+    bottom_left_diagonal_col = col
+    while bottom_left_diagonal_row < 7 or bottom_left_diagonal_col > 0:
+        if bottom_left_diagonal_row == 7 or bottom_left_diagonal_col == 0: break
+        bottom_left_diagonal_row +=1
+        bottom_left_diagonal_col -=1
+        if boardState[bottom_left_diagonal_row][bottom_left_diagonal_col] != "" and boardState[bottom_left_diagonal_row][bottom_left_diagonal_col].isupper() ^ piece.isupper():
+            bishop_possible_move.append([bottom_left_diagonal_row, bottom_left_diagonal_col])
+
+        if boardState[bottom_left_diagonal_row][bottom_left_diagonal_col] != "": break
+
+        bishop_possible_move.append([bottom_left_diagonal_row, bottom_left_diagonal_col])
+
+    bottom_right_diagonal_row = row
+    bottom_right_diagonal_col = col
+    while bottom_right_diagonal_row < 7 or bottom_right_diagonal_col < 7:
+        if bottom_right_diagonal_row == 7 or bottom_right_diagonal_col == 7: break
+        bottom_right_diagonal_row +=1
+        bottom_right_diagonal_col +=1
+        if boardState[bottom_right_diagonal_row][bottom_right_diagonal_col] != "" and boardState[bottom_right_diagonal_row][bottom_right_diagonal_col].isupper() ^ piece.isupper():
+            bishop_possible_move.append([bottom_right_diagonal_row, bottom_right_diagonal_col])
+
+        if boardState[bottom_right_diagonal_row][bottom_right_diagonal_col] != "": break
+
+        bishop_possible_move.append([bottom_right_diagonal_row, bottom_right_diagonal_col])
+    
+    return bishop_possible_move
+
+def bishopAttackingMove(row, col, boardState, move_turn):
+    bishop_attack_move = []
+    king = "K" if move_turn == "white" else "k"
+    top_left_diagonal_row = row
+    top_left_diagonal_col = col
+    while top_left_diagonal_row > 0 or top_left_diagonal_col > 0:
+        if top_left_diagonal_row == 0 or top_left_diagonal_col == 0: break
+        top_left_diagonal_row -=1
+        top_left_diagonal_col -=1
+        if boardState[top_left_diagonal_row][top_left_diagonal_col] == king:
+            bishop_attack_move.append([top_left_diagonal_row, top_left_diagonal_col])
+            continue
+
+        if boardState[top_left_diagonal_row][top_left_diagonal_col] != "" and boardState[top_left_diagonal_row][top_left_diagonal_col] != king:
+            bishop_attack_move.append([top_left_diagonal_row, top_left_diagonal_col])
+
+        if boardState[top_left_diagonal_row][top_left_diagonal_col] != "": 
+            bishop_attack_move.append([top_left_diagonal_row, top_left_diagonal_col])
+            break
+
+        bishop_attack_move.append([top_left_diagonal_row, top_left_diagonal_col])
+
+    
+    top_right_diagonal_row = row
+    top_right_diagonal_col = col
+    while top_right_diagonal_row > 0 or top_right_diagonal_col < 7:
+        if top_right_diagonal_row == 0 or top_right_diagonal_col == 7: break
+        top_right_diagonal_row -=1
+        top_right_diagonal_col +=1
+        if boardState[top_right_diagonal_row][top_right_diagonal_col] == king:
+            bishop_attack_move.append([top_right_diagonal_row, top_right_diagonal_col])
+            continue
+
+        if boardState[top_right_diagonal_row][top_right_diagonal_col] != "" and boardState[top_right_diagonal_row][top_right_diagonal_col] != king:
+            bishop_attack_move.append([top_right_diagonal_row, top_right_diagonal_col])
+
+        if boardState[top_right_diagonal_row][top_right_diagonal_col] != "": 
+            bishop_attack_move.append([top_right_diagonal_row, top_right_diagonal_col])
+            break
+
+        bishop_attack_move.append([top_right_diagonal_row, top_right_diagonal_col])
+
+
+    bottom_left_diagonal_row = row
+    bottom_left_diagonal_col = col
+    while bottom_left_diagonal_row < 7 or bottom_left_diagonal_col > 0:
+        if bottom_left_diagonal_row == 7 or bottom_left_diagonal_col == 0: break
+        bottom_left_diagonal_row +=1
+        bottom_left_diagonal_col -=1
+        if boardState[bottom_left_diagonal_row][bottom_left_diagonal_col] == king:
+            bishop_attack_move.append([bottom_left_diagonal_row, bottom_left_diagonal_col])
+            continue
+
+        if boardState[bottom_left_diagonal_row][bottom_left_diagonal_col] != "" and boardState[bottom_left_diagonal_row][bottom_left_diagonal_col] != king:
+            bishop_attack_move.append([bottom_left_diagonal_row, bottom_left_diagonal_col])
+
+        if boardState[bottom_left_diagonal_row][bottom_left_diagonal_col] != "": 
+            bishop_attack_move.append([bottom_left_diagonal_row, bottom_left_diagonal_col])
+            break
+
+        bishop_attack_move.append([bottom_left_diagonal_row, bottom_left_diagonal_col])
+
+
+    bottom_right_diagonal_row = row
+    bottom_right_diagonal_col = col
+    while bottom_right_diagonal_row < 7 or bottom_right_diagonal_col < 7:
+        if bottom_right_diagonal_row == 7 or bottom_right_diagonal_col == 7: break
+        bottom_right_diagonal_row +=1
+        bottom_right_diagonal_col +=1
+        if boardState[bottom_right_diagonal_row][bottom_right_diagonal_col] == king:
+            bishop_attack_move.append([bottom_right_diagonal_row, bottom_right_diagonal_col])
+            continue
+
+        if boardState[bottom_right_diagonal_row][bottom_right_diagonal_col] != "" and boardState[bottom_right_diagonal_row][bottom_right_diagonal_col] != king:
+            bishop_attack_move.append([bottom_right_diagonal_row, bottom_right_diagonal_col])
+
+        if boardState[bottom_right_diagonal_row][bottom_right_diagonal_col] != "": 
+            bishop_attack_move.append([bottom_right_diagonal_row, bottom_right_diagonal_col])
+            break
+
+        bishop_attack_move.append([bottom_right_diagonal_row, bottom_right_diagonal_col])
+
+
+    return bishop_attack_move
+
+
+def queenMove(piece, row, col, boardState):
+    queen_possible_move = []
+    line_move = rookMove(piece, row, col, boardState)
+    for line in line_move: queen_possible_move.append(line)
+
+    diagonal_move = bishopMove(piece, row, col, boardState)
+    for diagonal in diagonal_move: queen_possible_move.append(diagonal)
+    
+    return queen_possible_move
+
+def queenAttackingMove(row, col, boardState, move_turn):
+    queen_attacking_move = []
+    line_attacking_move = rookAttackingMove(row, col, boardState, move_turn)
+    for attacking_line in line_attacking_move: queen_attacking_move.append(attacking_line)
+
+    diagonal_attacking_move = bishopAttackingMove(row, col, boardState, move_turn)
+    for attacking_diagonal in diagonal_attacking_move: queen_attacking_move.append(attacking_diagonal)
+
+    return queen_attacking_move
+
+
+def kingMove(piece, row, col, boardState):
+    king_possible_move = []
+
+    if col > 0 and (boardState[row][col-1] == "" or boardState[row][col-1].isupper() ^ piece.isupper()):
+        king_possible_move.append([row, col-1])
+
+    if col < 7 and (boardState[row][col+1] == "" or boardState[row][col+1].isupper() ^ piece.isupper()):
+        king_possible_move.append([row, col+1])
+
+    if row > 0:
+        if (boardState[row-1][col] == "" or boardState[row-1][col].isupper() ^ piece.isupper()):
+            king_possible_move.append([row-1, col])
+
+        if col > 0 and (boardState[row-1][col-1] == "" or boardState[row-1][col-1].isupper() ^ piece.isupper()):
+            king_possible_move.append([row-1, col-1])
+
+        if col < 7 and (boardState[row-1][col+1] == "" or boardState[row-1][col+1].isupper() ^ piece.isupper()):
+            king_possible_move.append([row-1, col+1])
+
+    if row < 7:
+        if (boardState[row+1][col] == "" or boardState[row+1][col].isupper() ^ piece.isupper()):
+            king_possible_move.append([row+1, col])
+
+        if col > 0 and (boardState[row+1][col-1] == "" or boardState[row+1][col-1].isupper() ^ piece.isupper()):
+            king_possible_move.append([row+1, col-1])
+
+        if col < 7 and (boardState[row+1][col+1] == "" or boardState[row+1][col+1].isupper() ^ piece.isupper()):
+            king_possible_move.append([row+1, col+1])
+
+    return king_possible_move
+
+def kingAttackingMove(row, col, boardState, move_turn):
+    king_attack_move = []
+
+    king_attack_move.append([row-1, col-1])
+    king_attack_move.append([row-1, col])
+    king_attack_move.append([row-1, col+1])
+    king_attack_move.append([row, col-1])
+    king_attack_move.append([row, col+1])
+    king_attack_move.append([row+1, col-1])
+    king_attack_move.append([row+1, col])
+    king_attack_move.append([row+1, col+1])
+
+    return king_attack_move
+
+
+def getAttackedSquares(boardState, move_turn):
+    piece_name = "rnbqkp" if move_turn == "white" else "RNBQKP"
+    attacked_squares = []
+    for row in range(8):
+        for col in range(8):
+            left_pawn_diagonal = [row+1, col-1] if move_turn == "white" else [row-1, col-1]
+            right_pawn_diagonal = [row+1, col+1] if move_turn == "white" else [row-1, col+1]
+
+            if boardState[row][col] == "": continue
+
+            if boardState[row][col] == piece_name[0]:
+                attacked_squares += rookAttackingMove(row, col, boardState, move_turn)
+                
+            if boardState[row][col] == piece_name[1]:
+                attacked_squares += knightMove(boardState[row][col], row, col, boardState)
+
+            if boardState[row][col] == piece_name[2]:
+                attacked_squares += bishopAttackingMove(row, col, boardState, move_turn)
+                
+            if boardState[row][col] == piece_name[3]:
+                attacked_squares += queenAttackingMove(row, col, boardState, move_turn)
+
+            if boardState[row][col] == piece_name[4]:
+                attacked_squares += kingAttackingMove(row, col, boardState, move_turn)
+
+            if boardState[row][col] == piece_name[5]:
+                if col > 0:
+
+                    attacked_squares.append(left_pawn_diagonal)
+                if col < 7:
+                    attacked_squares.append(right_pawn_diagonal)
+    return attacked_squares
+
+
+def findKingPosition(boardState, move_turn):
+    king = "K" if move_turn == "white" else "k"
+    for row in range(8):
+        for col in range(8):
+            if boardState[row][col] == king:
+                return [row, col]
+            
+
+def simulateMove(start_row, start_col, end_row, end_col, piece, boardState, move_turn):
+    copy_board_state = []
+    for i in range(8):
+        copy_board_state.append(boardState[i].copy())
+    
+    copy_board_state[start_row][start_col] = ""
+    copy_board_state[end_row][end_col] = piece
+    king_in_check = isKingInCheck(copy_board_state, move_turn)
+    if king_in_check:
+        return False
+    else:
+        return True
+
+
+def isKingInCheck(boardState, move_turn):
+    king_pos = findKingPosition(boardState, move_turn)
+    attacked_squares = getAttackedSquares(boardState, move_turn)
+
+    if king_pos in attacked_squares:
+        return True
+    else:
+        return False
+
+
+def filterSafeMoves(start_row, start_col, possible_moves, piece, boardState, move_turn):
+    new_legal_moves = []
+
+    for i in range(len(possible_moves)):
+        end_row = possible_moves[i][0]
+        end_col = possible_moves[i][1]
+        simulate_result = simulateMove(start_row, start_col, end_row, end_col, piece, boardState, move_turn)
+        if simulate_result == True:
+            new_legal_moves.append([end_row, end_col])
+
+    return new_legal_moves

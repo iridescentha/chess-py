@@ -18,16 +18,37 @@ def getClickedSquare():
         return [square_y, square_x]
     return None
 
-def getLegalMoves(piece, row, col, boardState):
+def getLegalMoves(piece, start_row, start_col, boardState, move_turn):
+    attacked_squares = getAttackedSquares(boardState, move_turn)
     if piece.lower() == "p":
-        pawn_possible_move = pawnMove(piece, row, col, boardState)
-        return pawn_possible_move
+        pawn_possible_move = pawnMove(piece, start_row, start_col, boardState)
+        return filterSafeMoves(start_row, start_col, pawn_possible_move, piece, boardState, move_turn)
+    
     elif piece.lower() == "r":
-        rook_possible_move = rookMove(piece, row, col, boardState)
-        return rook_possible_move
-    else:
-        return []
-
+        rook_possible_move = rookMove(piece, start_row, start_col, boardState)
+        return filterSafeMoves(start_row, start_col, rook_possible_move, piece, boardState, move_turn)
+    
+    elif piece.lower() == "n":
+        knight_possible_move = knightMove(piece, start_row, start_col, boardState)
+        return filterSafeMoves(start_row, start_col, knight_possible_move, piece, boardState, move_turn)
+    
+    elif piece.lower() == "b":
+        bishop_possible_move = bishopMove(piece, start_row, start_col, boardState)
+        return filterSafeMoves(start_row, start_col, bishop_possible_move, piece, boardState, move_turn)
+    
+    elif piece.lower() == "q":
+        queen_possible_move = queenMove(piece, start_row, start_col, boardState)
+        return filterSafeMoves(start_row, start_col, queen_possible_move, piece, boardState, move_turn)
+    
+    elif piece.lower() == "k":
+        king_possible_move = kingMove(piece, start_row, start_col, boardState)
+        filtered_king_possible_move = []
+        for move in king_possible_move:
+            if move not in attacked_squares:
+                filtered_king_possible_move.append(move)
+            else:
+                continue
+        return filtered_king_possible_move
 
 def main():
     running = True
@@ -49,9 +70,11 @@ def main():
                             clicked_row, clicked_col = clicked_position[0], clicked_position[1]
 
                         if board.boardState[clicked_row][clicked_col] != "":
-                            selected_square = [clicked_row, clicked_col]
                             piece = board.boardState[clicked_row][clicked_col]
-                            legal_moves = getLegalMoves(piece, clicked_row, clicked_col, board.boardState)
+                            if piece.islower() and board.move_turn == "black" or piece.isupper() and board.move_turn == "white":
+                                selected_square = [clicked_row, clicked_col]
+                                legal_moves = getLegalMoves(piece, clicked_row, clicked_col, board.boardState, board.move_turn)
+                            else: print("Not your Move!"); 
 
                         
                 else:
@@ -66,15 +89,19 @@ def main():
 
                         if [end_row, end_col] in legal_moves:
                             board.movePiece(start_row, start_col, end_row, end_col, piece, board.boardState)
+                            if piece.isupper(): board.move_turn = "black"
+                            else: board.move_turn = "white"
+                            
                             selected_square = None
                             
                         elif [end_row, end_col] not in legal_moves and board.boardState[end_row][end_col] == "":
                             selected_square = None
 
                         elif board.boardState[end_row][end_col] != "":
-                            selected_square = [end_row, end_col]
-                            piece = board.boardState[end_row][end_col]
-                            legal_moves = getLegalMoves(piece, end_row, end_col, board.boardState)
+                            if board.boardState[end_row][end_col].islower() and board.move_turn == "black" or board.boardState[end_row][end_col].isupper() and board.move_turn == "white":
+                                selected_square = [end_row, end_col]
+                                piece = board.boardState[end_row][end_col]
+                                legal_moves = getLegalMoves(piece, end_row, end_col, board.boardState, board.move_turn)
                             continue
                     else: 
                         continue
