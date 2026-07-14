@@ -1,4 +1,0 @@
-{
-    "python.defaultInterpreterPath": "~/.venvs/chess-py/bin/python",
-    "python.terminal.activateEnvironment": true
-}
