@@ -49,13 +49,35 @@ def getLegalMoves(piece, start_row, start_col, boardState, move_turn):
             else:
                 continue
         return filtered_king_possible_move
+    
+def hasAnyLegalMoves(boardState, move_turn):
+    piece_name = "RNBQKP" if move_turn == "white" else "rnbqkp"
+    remaining_legal_moves = []
 
+    for row in range(8):
+        for col in range(8):
+            if boardState[row][col] != "" and boardState[row][col] in piece_name:
+                for legal_list in getLegalMoves(boardState[row][col], row, col, boardState, move_turn):
+                    remaining_legal_moves.append(legal_list)
+    
+    if remaining_legal_moves: return True
+    else: return False
+
+def checkGameStatus(boardState, move_turn, king_in_check):
+    if not hasAnyLegalMoves(boardState, move_turn) and king_in_check:
+        return "checkmate"
+    elif not hasAnyLegalMoves(boardState, move_turn) and not king_in_check:
+        return "stalemate"
+                      
 def main():
     running = True
     board = Board()
     selected_square = None
     legal_moves = []
     king_in_check = False
+    game_over = None
+    promote_time = False
+    pawn_promote_pos = []
     while running:
         for event in pygame.event.get():
 
@@ -66,7 +88,7 @@ def main():
                 clicked_position = getClickedSquare()
                 if not clicked_position: continue
 
-                if selected_square is None:
+                if selected_square is None and game_over is None and promote_time is False:
                         if clicked_position != None:
                             clicked_row, clicked_col = clicked_position[0], clicked_position[1]
 
@@ -79,6 +101,49 @@ def main():
 
                         
                 else:
+                    if game_over is not None or promote_time is True: 
+                        clicked_position = getClickedSquare()
+                        pawn_row = 0 if board.move_turn == "white" else 7
+                        promotion_row = 0 if board.move_turn == "white" else 7
+                        operation1 = 1 if board.move_turn == "white" else -1
+                        operation2 = 2 if board.move_turn == "white" else -2
+                        operation3 = 3 if board.move_turn == "white" else -3
+                        end_row, end_col = clicked_position[0], clicked_position[1]
+                        if end_row == pawn_row and end_col == pawn_promote_pos[1]:
+                            board.boardState[pawn_row][end_col] = "Q" if board.move_turn == "white" else "q"
+                            promote_time = False
+                            if board.move_turn == "white": board.move_turn = "black"
+                            else: board.move_turn = "white"
+                            king_in_check = isKingInCheck(board.boardState, board.move_turn)
+                            game_over = checkGameStatus(board.boardState, board.move_turn, king_in_check)
+
+                        elif end_row == (pawn_row + operation1) and end_col == pawn_promote_pos[1]:
+                            board.boardState[promotion_row][end_col] = "N" if board.move_turn == "white" else "n"
+                            promote_time = False
+                            if board.move_turn == "white": board.move_turn = "black"
+                            else: board.move_turn = "white"
+                            king_in_check = isKingInCheck(board.boardState, board.move_turn)
+                            game_over = checkGameStatus(board.boardState, board.move_turn, king_in_check)
+
+                        if end_row == (pawn_row + operation2) and end_col == pawn_promote_pos[1]:
+                            board.boardState[promotion_row][end_col] = "R" if board.move_turn == "white" else "r"
+                            promote_time = False
+                            if board.move_turn == "white": board.move_turn = "black"
+                            else: board.move_turn = "white"
+                            king_in_check = isKingInCheck(board.boardState, board.move_turn)
+                            game_over = checkGameStatus(board.boardState, board.move_turn, king_in_check)
+
+    
+                        if end_row == (pawn_row + operation3) and end_col == pawn_promote_pos[1]:
+                            board.boardState[promotion_row][end_col] = "B" if board.move_turn == "white" else "b"
+                            promote_time = False
+                            if board.move_turn == "white": board.move_turn = "black"
+                            else: board.move_turn = "white"
+                            king_in_check = isKingInCheck(board.boardState, board.move_turn)
+                            game_over = checkGameStatus(board.boardState, board.move_turn, king_in_check)
+                            
+                        continue
+
                     start_row, start_col = selected_square[0], selected_square[1]
                     clicked_position = getClickedSquare()
 
@@ -89,10 +154,15 @@ def main():
                         if legal_moves == None: continue
 
                         if [end_row, end_col] in legal_moves:
-                            board.movePiece(start_row, start_col, end_row, end_col, piece, board.boardState)
-                            if piece.isupper(): board.move_turn = "black"
-                            else: board.move_turn = "white"
+
+                            if board.movePiece(start_row, start_col, end_row, end_col, piece, board.boardState, screen) == "promote_time":
+                                promote_time = True
+                                pawn_promote_pos = [end_row, end_col]
+
+                            if piece.isupper() and promote_time is False: board.move_turn = "black"
+                            elif piece.islower() and promote_time is False: board.move_turn = "white"
                             king_in_check = isKingInCheck(board.boardState, board.move_turn)
+                            game_over = checkGameStatus(board.boardState, board.move_turn, king_in_check)
                             
                             selected_square = None
                             
@@ -109,17 +179,20 @@ def main():
                         continue
                 
                 
-        screen.fill("white")
-        
+        screen.fill("#312e2b")
         board.drawSquares(screen)
-        if selected_square is not None:
-            board.highlightSquare(screen, selected_square)
         if king_in_check:
             board.highlightKingCheck(screen, findKingPosition(board.boardState, board.move_turn))
+        if selected_square is not None:
+            board.highlightSquare(screen, selected_square)
         board.drawBoard(screen, screen_rect)
         board.drawPieces(screen)
         if selected_square is not None:
             board.highlightLegalMoves(screen, legal_moves)
+        if promote_time == True:
+            board.promotePawn(screen, pawn_promote_pos, board.move_turn)
+        if game_over is not None:
+            board.drawGameOver(screen, game_over, pygame.font.SysFont("Arial", 30))
 
 
         pygame.display.flip()
