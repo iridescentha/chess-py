@@ -39,8 +39,6 @@ class Board:
         "q": black_queen,
         "k": black_king,
     }
-    
-
     def __init__(self):
         self.boardState = [
             ["r", "n", "b", "q", "k", "b", "n", "r"],
@@ -53,6 +51,15 @@ class Board:
             ["R", "N", "B", "Q", "K", "B", "N", "R"],
             ]
         self.move_turn = "white"
+        self.white_king_has_moved = False
+        self.black_king_has_moved = False
+
+        self.white_left_rook_has_moved = False
+        self.black_left_rook_has_moved = False
+
+        self.white_right_rook_has_moved = False
+        self.black_right_rook_has_moved = False
+
 
     def drawBoard(self, screen, screen_rect):
         rect = pygame.Rect(0, 0, self.board_size, self.board_size)
@@ -125,6 +132,39 @@ class Board:
             return "promote_time"
         else:
             boardState[end_row][end_col] = piece
+
+        if piece.lower() == "k":
+            if abs(end_col - current_col) == 2:
+                
+                if current_col < end_col:
+                    if current_row == 7:
+                        boardState[end_row][end_col-1] = "R"
+                        boardState[end_row][7] = ""
+                    else:
+                        boardState[end_row][end_col-1] = "r"
+                        boardState[end_row][7] = ""
+                
+                elif current_col > end_col:
+                    if current_row == 7:
+                        boardState[end_row][end_col+1] = "R"
+                        boardState[end_row][0] = ""
+                    else:
+                        boardState[end_row][end_col+1] = "r"
+                        boardState[end_row][0] = ""
+            if piece == "K": self.white_king_has_moved = True
+            else: self.black_king_has_moved = True
+        
+        if piece == "R":
+            if current_col == 7 and current_row == 7:
+                self.white_right_rook_has_moved = True
+            elif current_col == 0 and current_row == 7:
+                self.white_left_rook_has_moved = True
+        elif piece == "r":
+            if current_col == 7 and current_row == 0:
+                self.black_right_rook_has_moved = True
+            elif current_col == 0 and current_row == 0:
+                self.black_left_rook_has_moved = True
+
 
     def highlightSquare(self, screen, rowAndCol: list[int]):
 
