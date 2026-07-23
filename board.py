@@ -39,7 +39,6 @@ class Board:
         "q": black_queen,
         "k": black_king,
     }
-
     def __init__(self):
         self.boardState = [
             ["r", "n", "b", "q", "k", "b", "n", "r"],
@@ -52,11 +51,20 @@ class Board:
             ["R", "N", "B", "Q", "K", "B", "N", "R"],
             ]
         self.move_turn = "white"
+        self.white_king_has_moved = False
+        self.black_king_has_moved = False
+
+        self.white_left_rook_has_moved = False
+        self.black_left_rook_has_moved = False
+
+        self.white_right_rook_has_moved = False
+        self.black_right_rook_has_moved = False
+
 
     def drawBoard(self, screen, screen_rect):
         rect = pygame.Rect(0, 0, self.board_size, self.board_size)
         rect.center = screen_rect.center
-        pygame.draw.rect(screen, "black", rect, 5)
+        pygame.draw.rect(screen, "black", rect, 3)
 
     def drawSquares(self, screen,):
         for row in range(8):
@@ -88,12 +96,75 @@ class Board:
                     image_piece = self.piece_image[piece]
                     self.drawPieceCentered(image_piece, row, col, screen)
 
-    def movePiece(self, current_row, current_col, end_row, end_col, piece, boardState):
+    def promotePawn(self, screen, pawn_pos, move_turn):
+        x_calculation = 560 if move_turn == "black" else 0
+        x_operation = -80 if move_turn == "black" else 80
+        x_operation2 = -160 if move_turn == "black" else 160
+        x_operation3 = -240 if move_turn == "black" else 240
+        x_draw_piece = x_calculation // 80 if move_turn == "black" else 0
+        x_draw_piece_operation = -1 if move_turn == "black" else 1
+        x_draw_piece_operation2 = -2 if move_turn == "black" else 2
+        x_draw_piece_operation3 = -3 if move_turn == "black" else 3
+        queen_promote_square = pygame.Rect(self.board_left + (pawn_pos[1] * self.square_size), self.board_top + (x_calculation), self.square_size, self.square_size)
+        queen_image_piece = self.piece_image["Q"] if move_turn == "white" else self.piece_image["q"]
+        
+        knight_promote_square = pygame.Rect(self.board_left + (pawn_pos[1] * self.square_size), self.board_top + (x_calculation + x_operation), self.square_size, self.square_size)
+        knight_image_piece = self.piece_image["N"] if move_turn == "white" else self.piece_image["n"]
+        
+        rook_promote_square = pygame.Rect(self.board_left + (pawn_pos[1] * self.square_size), self.board_top + (x_calculation + x_operation2), self.square_size, self.square_size)
+        rook_image_piece = self.piece_image["R"] if move_turn == "white" else self.piece_image["r"]
+        
+        bishop_promote_square = pygame.Rect(self.board_left + (pawn_pos[1] * self.square_size), self.board_top + (x_calculation + x_operation3), self.square_size, self.square_size)
+        bishop_image_piece = self.piece_image["B"] if move_turn == "white" else self.piece_image["b"]
+
+        pygame.draw.rect(screen, "white", queen_promote_square, 0)
+        self.drawPieceCentered(queen_image_piece, pawn_pos[1], x_draw_piece, screen)
+        pygame.draw.rect(screen, "white", knight_promote_square, 0)
+        self.drawPieceCentered(knight_image_piece, pawn_pos[1], x_draw_piece + x_draw_piece_operation, screen)
+        pygame.draw.rect(screen, "white", rook_promote_square, 0)
+        self.drawPieceCentered(rook_image_piece, pawn_pos[1], x_draw_piece + x_draw_piece_operation2, screen)
+        pygame.draw.rect(screen, "white", bishop_promote_square, 0)
+        self.drawPieceCentered(bishop_image_piece, pawn_pos[1], x_draw_piece + x_draw_piece_operation3, screen)
+
+    def movePiece(self, current_row, current_col, end_row, end_col, piece, boardState, screen):
         boardState[current_row][current_col] = ""
         if piece.lower() == "p" and (end_row == 0 or end_row == 7):
-            boardState[end_row][end_col] = "Q" if piece == "P" else "q"
+            return "promote_time"
         else:
             boardState[end_row][end_col] = piece
+
+        if piece.lower() == "k":
+            if abs(end_col - current_col) == 2:
+                
+                if current_col < end_col:
+                    if current_row == 7:
+                        boardState[end_row][end_col-1] = "R"
+                        boardState[end_row][7] = ""
+                    else:
+                        boardState[end_row][end_col-1] = "r"
+                        boardState[end_row][7] = ""
+                
+                elif current_col > end_col:
+                    if current_row == 7:
+                        boardState[end_row][end_col+1] = "R"
+                        boardState[end_row][0] = ""
+                    else:
+                        boardState[end_row][end_col+1] = "r"
+                        boardState[end_row][0] = ""
+            if piece == "K": self.white_king_has_moved = True
+            else: self.black_king_has_moved = True
+        
+        if piece == "R":
+            if current_col == 7 and current_row == 7:
+                self.white_right_rook_has_moved = True
+            elif current_col == 0 and current_row == 7:
+                self.white_left_rook_has_moved = True
+        elif piece == "r":
+            if current_col == 7 and current_row == 0:
+                self.black_right_rook_has_moved = True
+            elif current_col == 0 and current_row == 0:
+                self.black_left_rook_has_moved = True
+
 
     def highlightSquare(self, screen, rowAndCol: list[int]):
 
@@ -112,3 +183,18 @@ class Board:
         y = self.board_top + (king_pos[0] * self.square_size)
         x = self.board_left + (king_pos[1] * self.square_size)
         pygame.draw.rect(screen, "red", pygame.Rect(x, y, self.square_size, self.square_size))
+
+    def drawGameOver(self, screen, status, font):
+        y = self.board_top + 80
+        x = self.board_left + 120
+        pygame.draw.rect(screen, "cornsilk1", pygame.Rect(x, y, 400, 480), 0, 10)
+        self.drawText(screen, "Game Over!", font, "black", self.board_left + 250, self.board_top + 80) 
+        if status == "checkmate":
+            self.drawText(screen, "CHECKMATE!", font, "black", self.board_left + 240, self.board_top + 120)
+        elif status == "stalemate":
+            self.drawText(screen, "STALEMATE!", font, "black", self.board_left + 240, self.board_top + 120)
+
+    def drawText(self, screen, text, font, text_color, x, y):
+        img = font.render(text, True, text_color)
+        screen.blit(img, (x,y))
+
