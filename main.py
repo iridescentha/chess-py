@@ -22,6 +22,8 @@ def getLegalMoves(piece, start_row, start_col, board):
     attacked_squares = getAttackedSquares(board.boardState, board.move_turn)
     if piece.lower() == "p":
         pawn_possible_move = pawnMove(piece, start_row, start_col, board.boardState)
+        if [start_row, start_col] in board.en_passant:
+            pawn_possible_move.append(board.en_passant[-1])
         return filterSafeMoves(start_row, start_col, pawn_possible_move, piece, board.boardState, board.move_turn)
     
     elif piece.lower() == "r":
@@ -188,7 +190,7 @@ def main():
 
                         if [end_row, end_col] in legal_moves:
 
-                            if board.movePiece(start_row, start_col, end_row, end_col, piece, board.boardState, screen) == "promote_time":
+                            if board.movePiece(start_row, start_col, end_row, end_col, piece, board.boardState) == "promote_time":
                                 promote_time = True
                                 pawn_promote_pos = [end_row, end_col]
 

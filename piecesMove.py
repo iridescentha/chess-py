@@ -406,7 +406,7 @@ def getAttackedSquares(boardState, move_turn):
                 if col > 0:
 
                     attacked_squares.append(left_pawn_diagonal)
-                if col < 7:
+                if col < 7: 
                     attacked_squares.append(right_pawn_diagonal)
     return attacked_squares
 

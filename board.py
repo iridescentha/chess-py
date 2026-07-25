@@ -60,6 +60,8 @@ class Board:
         self.white_right_rook_has_moved = False
         self.black_right_rook_has_moved = False
 
+        self.en_passant = []
+
 
     def drawBoard(self, screen, screen_rect):
         rect = pygame.Rect(0, 0, self.board_size, self.board_size)
@@ -126,10 +128,18 @@ class Board:
         pygame.draw.rect(screen, "white", bishop_promote_square, 0)
         self.drawPieceCentered(bishop_image_piece, pawn_pos[1], x_draw_piece + x_draw_piece_operation3, screen)
 
-    def movePiece(self, current_row, current_col, end_row, end_col, piece, boardState, screen):
+    def movePiece(self, current_row, current_col, end_row, end_col, piece, boardState):
+        square_behind_pawn = -1 if piece == "p" else 1
+        if piece.lower() == "p" and end_col != current_col and boardState[end_row][end_col] == "":
+            boardState[end_row][end_col] = piece
+            boardState[end_row+square_behind_pawn][end_col] = ""
         boardState[current_row][current_col] = ""
+        self.en_passant  = []
         if piece.lower() == "p" and (end_row == 0 or end_row == 7):
             return "promote_time"
+        elif piece.lower() == "p" and abs(end_row - current_row) == 2:
+            self.en_passant = [[end_row, end_col-1], [end_row, end_col+1], [end_row + square_behind_pawn, end_col]]
+            boardState[end_row][end_col] = piece
         else:
             boardState[end_row][end_col] = piece
 
