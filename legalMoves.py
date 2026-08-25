@@ -76,3 +76,9 @@ def hasAnyLegalMoves(board):
     
     if remaining_legal_moves: return True
     else: return False
+
+def checkGameStatus(board, king_in_check):
+    if not hasAnyLegalMoves(board) and king_in_check:
+        return "checkmate"
+    elif not hasAnyLegalMoves(board) and not king_in_check:
+        return "stalemate"

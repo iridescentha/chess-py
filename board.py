@@ -62,6 +62,8 @@ class Board:
 
         self.en_passant = []
 
+        
+
 
     def drawBoard(self, screen, screen_rect):
         rect = pygame.Rect(0, 0, self.board_size, self.board_size)

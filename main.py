@@ -3,6 +3,7 @@ from board import Board
 from sys import exit
 from legalMoves import *
 from pawnPromotion import *
+from aiEngine import *
 
 pygame.init()
 pygame.display.set_caption("Chess")
@@ -18,12 +19,6 @@ def getClickedSquare():
         square_y = local_y // 80
         return [square_y, square_x]
     return None
-
-def checkGameStatus(board, king_in_check):
-    if not hasAnyLegalMoves(board) and king_in_check:
-        return "checkmate"
-    elif not hasAnyLegalMoves(board) and not king_in_check:
-        return "stalemate"
                       
 def main():
     running = True
