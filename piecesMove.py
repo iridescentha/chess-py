@@ -167,6 +167,23 @@ def knightMove(piece, row, col, boardState):
             knight_possible_move.append([row+1, col+2])
     return knight_possible_move
 
+def knightAttackingMove(row, col):
+    knight_attacking_move = []
+
+    knight_attacking_move.append([row-2, col-1])
+    knight_attacking_move.append([row-2, col+1])
+
+    knight_attacking_move.append([row-1, col-2])
+    knight_attacking_move.append([row-1, col+2])
+
+    knight_attacking_move.append([row+2, col-1])
+    knight_attacking_move.append([row+2, col+1])
+
+    knight_attacking_move.append([row+1, col-2])
+    knight_attacking_move.append([row+1, col+2])
+
+    return knight_attacking_move
+
 
 def bishopMove(piece, row, col, boardState):
     bishop_possible_move = []
@@ -391,7 +408,7 @@ def getAttackedSquares(boardState, move_turn):
                 attacked_squares += rookAttackingMove(row, col, boardState, move_turn)
                 
             if boardState[row][col] == piece_name[1]:
-                attacked_squares += knightMove(boardState[row][col], row, col, boardState)
+                attacked_squares += knightAttackingMove(row, col)
 
             if boardState[row][col] == piece_name[2]:
                 attacked_squares += bishopAttackingMove(row, col, boardState, move_turn)
